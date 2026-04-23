@@ -19,7 +19,7 @@ spec:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_API_URL
-              value: "http://YOUR_EC2_IP:30001"
+              value: "http://98.84.43.161:30001"
 
 ---
 apiVersion: v1
