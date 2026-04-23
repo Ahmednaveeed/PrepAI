@@ -1,0 +1,82 @@
+---
+- name: Configure PrepAI Server
+  hosts: prepai_server
+  become: true
+
+  tasks:
+
+    # ── 1. System Update ────────────────────────────
+    - name: Update apt packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    # ── 2. Install Docker ───────────────────────────
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    # ── 3. Install MicroK8s ─────────────────────────
+    - name: Install MicroK8s
+      snap:
+        name: microk8s
+        classic: yes
+        channel: 1.28/stable
+
+    - name: Add ubuntu user to microk8s group
+      user:
+        name: ubuntu
+        groups: microk8s
+        append: yes
+
+    - name: Enable MicroK8s addons
+      command: microk8s enable dns registry ingress
+      changed_when: false
+
+    # ── 4. Install kubectl ──────────────────────────
+    - name: Set up kubectl alias
+      lineinfile:
+        path: /home/ubuntu/.bashrc
+        line: "alias kubectl='microk8s kubectl'"
+        state: present
+
+    # ── 5. Install ArgoCD ───────────────────────────
+    - name: Create ArgoCD namespace
+      command: microk8s kubectl create namespace argocd
+      ignore_errors: yes
+
+    - name: Install ArgoCD
+      command: microk8s kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      changed_when: false
+
+    - name: Patch ArgoCD server to NodePort
+      command: >
+        microk8s kubectl patch svc argocd-server -n argocd
+        -p '{"spec":{"type":"NodePort","ports":[{"port":443,"targetPort":8080,"nodePort":30008}]}}'
+      changed_when: false
