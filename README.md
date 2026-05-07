@@ -1,6 +1,6 @@
 # PrepAI — AI Mock Interviewer
 
-A full-stack AI-powered mock interview platform where users practice role-specific technical interviews, receive instant GPT-4o feedback, and track their performance over time. Built end-to-end — from code to cloud — as a complete DevOps learning project covering containerization, Kubernetes orchestration, cloud provisioning, and CI/CD.
+A full-stack AI-powered mock interview platform where users practice role-specific technical interviews, receive instant AI feedback, and track their performance over time. Built end-to-end — from code to cloud — as a complete DevOps learning project covering containerization, Kubernetes orchestration, cloud provisioning, and CI/CD.
 
 ---
 
@@ -289,10 +289,3 @@ npm run dev
 - **Terraform state management:** Never commit `.tfstate` files. Use remote state (S3 backend) in team environments.
 - **EC2 Security Groups are the firewall:** Kubernetes opens the port, but AWS Security Groups must also allow that port — both must be configured.
 - **`.env` files are gitignored by design:** Secrets never go into source control. Use Kubernetes Secrets or environment injection at deploy time.
-
----
-
-## Author
-
-**Ahmed Naveed** — BSCS Undergraduate, FAST NUCES Islamabad  
-[GitHub](https://github.com/Ahmednaveeed)
